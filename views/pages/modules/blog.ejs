@@ -1,0 +1,11 @@
+<div class="window-data" id="blog">
+
+<% for (let post of posts) { %>
+    <div class="post">
+        <div class="post-header"><%- post.title %></div>
+        <div class="post-date"><%- post.date %></div>
+        <div class="post-message"><%- post.html %></div>
+    </div>
+<% } %>
+
+</div>

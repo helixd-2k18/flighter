@@ -1,0 +1,485 @@
+
+/* Mixins */
+/**********/
+
+@mixin background-pattern($color) {
+    background-color: $color;
+    background-image: url("../images/debut-light.png");
+    background-repeat: repeat repeat;
+    background-origin: border-box;
+    background-clip: border-box;
+    /*background-attachment: fixed;*/
+    background-blend-mode: multiply;
+    background-size: 100px 100px;
+}
+
+@mixin background-image($image){
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-origin: border-box;
+    background-image: $image;
+}
+
+
+
+/* Containement */
+/****************/
+
+:root {
+    --edge-width: 160px;
+    --edge-height: 90px;
+    --drag-x: 0, --drag-y: 0;
+    --highlight-color: rgba(0,0,0,0.1);
+    --border-color: rgba(0,0,0,0.1);
+}
+
+html, body {
+    padding: 0;
+    margin: 0;
+    font-family: Calibri, Carlito;
+    font-size: 0.94em;
+    min-height: 100vh;
+    height: 100%;
+}
+
+body {
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.background {
+    @include background-image(url("../images/3840x2160.jpg"));
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0; top: 0;
+    display: flex;
+    transform: translate3d(1em, 0em, 0em) translate3d(-1em, 0em, 0em);
+    
+    clip: rect(0 100% 100% 0);
+    clip-path: inset(0);
+    -webkit-clip-path: inset(0);
+}
+
+.container {
+    font-size: 0.9em;
+    @include background-pattern(rgba(255, 255, 255, 0.0));
+}
+
+.overlay {
+    width: 100%;
+    height: 100%;
+    display: block;
+    position: fixed;
+    overflow: hidden;
+    max-width: 100vw;
+    max-height: 100vh;
+    left: 0; top: 0;
+    position: fixed;
+    z-index: 100;
+}
+
+
+
+/* Layered Layout */
+/******************/
+
+.grinder {
+    display: grid;
+    grid-template-columns: var(--edge-width) 1fr var(--edge-width);
+    grid-template-rows: var(--edge-height) 1fr var(--edge-height);
+    width: 100vw;
+    height: 100vh;
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.grinder .header, .grinder .footer {
+    grid-column: span 3;
+    grid-row: span 1;
+}
+
+.grinder .left, .grinder .right {
+    grid-column: span 1;
+    grid-row: span 1;
+}
+
+.grinder .focus {
+    grid-column: span 1;
+    grid-row: span 1;
+}
+
+
+
+/* Window Layout */
+/*****************/
+
+.window-container {
+    --drag-x: 0px; --drag-y: 0px; --border-w: 0px;
+    --size-x: 0px; --size-y: 0px;
+    transform: translate(var(--drag-x), var(--drag-y));
+
+    position: relative;
+    overflow: hidden;
+    
+    width: calc(100% + var(--size-x));
+    height: calc(100% + var(--size-y));
+    /*min-width: 640px;
+    min-height: 360px;*/
+    
+    box-sizing: border-box;
+    box-shadow: 0px 0px 1em rgba(0,0,0,0.5);
+    /*border-radius: 1px;*/
+    border: solid 0px var(--border-color);
+    display: grid;
+    grid-template-columns: calc(200px - var(--border-w)) 1fr;
+    grid-template-rows: 25px 25px 1fr 20px;
+    
+    font-size: 0.9em;
+}
+
+.window-container .window-title, .window-navbar, .window-status {
+    position: relative;
+    display: flex;
+    z-index: 1;
+    cursor: move;
+    
+    width: 100%;
+    font-size: 1.0em;
+    /*padding: 2px;*/
+    box-sizing: border-box;
+    grid-column: span 2;
+
+    background-clip: padding-box;
+    background-origin: padding-box;
+}
+
+.window-container .window-title {
+    padding: 4px;
+    font-weight: bolder;
+    background-color: rgba(13, 13, 13, 0.9);
+    color: rgb(240, 240, 240);
+}
+
+.window-container .window-bgcnt {
+    position: absolute;
+    z-index: 0;
+    left: 0; top: 0;
+    width: 100%;
+    height: 100%;
+    min-height: 100%;
+    display: flex;
+    overflow: hidden;
+
+    backdrop-filter: blur(1em);
+    -ms-backdrop-filter: blur(1em);
+    -webkit-backdrop-filter: blur(1em);
+
+    clip: rect(0 100% 100% 0);
+    clip-path: inset(0);
+    -webkit-clip-path: inset(0);
+}
+
+$blurRadius: 2em;
+
+.window-container .window-background {
+    position: absolute;
+    z-index: 0;
+    top: (-$blurRadius); right: (-$blurRadius); bottom: (-$blurRadius); left: (-$blurRadius);
+    width: calc(100% + #{$blurRadius*2});
+    height: calc(100% + #{$blurRadius*2});
+    display: flex;
+    overflow: visible;
+}
+
+/* Conviction For Mozilla Firefox */
+@supports (-moz-appearance:none) {
+    .window-container .window-bgcnt {
+        background-color: rgba(0,0,0,0.0);
+    }
+
+    .window-container .window-background {
+        clip: rect(0 100% 100% 0);
+        clip-path: inset(0);
+        -webkit-clip-path: inset(0);
+
+        transform: translate3d(1em, 0em, 0em) translate3d(-1em, 0em, 0em);
+        background-clip: padding-box;
+        background-origin: padding-box;
+        background-image: -moz-element(unquote("#background"));
+        background-position: calc(#{$blurRadius} - var(--edge-width) - var(--drag-x)) calc(#{$blurRadius} - var(--edge-height) - var(--drag-y));
+        background-attachment: fixed;
+        filter: blur(1em); // mozilla only
+    }
+}
+
+.window-container .window-content,
+.window-container .window-navbar,
+.window-container .window-sidebar,
+.window-container .window-content,
+.window-container .window-status
+{
+    @include background-pattern(rgba(255, 255, 255, 0.9));
+}
+
+
+.window-container .window-content, .window-sidebar {
+    position: relative;
+    display: flex;
+    z-index: 1;
+    font-size: 0.9em;
+    box-sizing: border-box;
+    grid-column: span 1;
+    overflow: auto;
+}
+
+.window-container .window-content .window-data:target {
+    display: block;
+}
+
+.window-container .window-content .window-data {
+    display: none;
+    box-sizing: border-box;
+    padding: 10px;
+    width: calc(100% - 20px);
+}
+
+.window-container .window-content h2 {
+    margin-bottom: 5px;
+    margin-top: 5px;
+}
+
+.window-container .window-navbar, .window-sidebar, .window-status, .window-content {
+    font-family: Cambria, Calibri, Carlito;
+}
+
+
+
+/* Login */
+/*********/
+
+.window-container .window-login {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+}
+
+.window-container .window-login .label {
+    grid-column: span 1;
+}
+
+.window-container .window-login input {
+    grid-column: span 1;
+    width: 100px;
+    font-size: 0.9em;
+    border: dotted 1px var(--border-color);
+    background-color: rgba(255, 255, 255, 0.0);
+    background-clip: padding-box;
+}
+
+
+
+/* Sidebar */
+/***********/
+
+.window-container .window-sidebar {
+    grid-column: span 1;
+    cursor: auto;
+    display: grid;
+    grid-template-rows: repeat(auto-fit, 30px);
+    border-right: solid 1px var(--border-color);
+    padding: 0px;
+    box-sizing: border-box;
+}
+
+.window-container .window-sidebar .button {
+    grid-row: span 1;
+    box-sizing: border-box;
+    padding: 8px;
+    border-bottom: solid 1px var(--border-color);
+    font-size: 1.1em;
+    cursor: pointer;
+    color: rgba(0,0,0,0.9);
+
+    text-decoration: none;
+    background-clip: padding-box;
+}
+
+.window-container .window-sidebar .button:hover {
+    background-color: var(--highlight-color);
+}
+
+
+
+/* About */
+/*********/
+
+.window-container .about-fields {
+    display: grid;
+    grid-template-columns: 60px 1fr;
+}
+
+
+
+/* Status */ 
+/**********/
+
+.window-container .window-status {
+    cursor: auto;
+    overflow: visible;
+    padding: 0px;
+    position: relative;
+    z-index: 2;
+    grid-column: span 1;
+    border-top: solid 1px var(--border-color);
+    grid-column: span 2;
+    display: grid;
+    grid-template-columns: 1fr 20px;
+}
+
+.window-container .window-status .resize-handle {
+    box-sizing: border-box;
+    border-left: solid 1px var(--border-color);
+    cursor: nwse-resize;
+}
+
+
+
+/* Navbar */ 
+/**********/
+
+.window-container .window-navbar {
+    cursor: auto;
+    overflow: visible;
+    padding: 0px;
+    position: relative;
+    z-index: 2;
+    grid-column: span 1;
+    border-bottom: solid 1px var(--border-color);
+}
+
+.window-navbar .nav, .nav-handle {
+    position: relative;
+    overflow: visible;
+    display: inline;
+    color: rgb(20,20,20);
+    box-sizing: border-box;
+    margin-left: -1px;
+}
+
+.window-navbar .nav .nav-list {
+    display: none;
+    position: absolute;
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(auto-fit, 25px);
+    min-width: 100px;
+    z-index: 10;
+    border-left: solid 1px var(--border-color);
+    border-right: solid 1px var(--border-color);
+    box-sizing: border-box;
+    box-shadow: 0px 2px 4px -2px rgba(0,0,0,0.9);
+}
+
+.window-navbar .nav .nav-button {
+    --border-w: 0px;
+    min-width: calc(100px - var(--border-w));
+    height: 100%;
+    padding: 5px;
+    border-left: solid 1px var(--border-color);
+    border-right: solid 1px transparent;
+    box-sizing: border-box;
+    cursor: default;
+    background-clip: padding-box;
+}
+
+.window-navbar .nav .nav-button:hover {
+    background-color: var(--highlight-color);
+}
+
+.window-navbar .nav:last-of-type .nav-button {
+    --border-w: 0px;
+    border-right: solid 1px var(--border-color);
+}
+
+.window-navbar .nav .nav-list {
+    @include background-pattern(rgba(255, 255, 255, 1.0));
+}
+
+.window-navbar .nav .nav-list > a {
+    grid-column: span 1;
+    border-bottom: solid 1px var(--border-color);
+    display: grid;
+    grid-template-columns: 1fr 10px;
+    box-sizing: border-box;
+    color: rgb(20,20,20);
+    text-decoration: none;
+    background-clip: padding-box;
+}
+
+.window-navbar .nav .nav-list > a:hover {
+    background-color: var(--highlight-color);
+}
+
+.window-navbar .nav .nav-list > a span {
+    display: block;
+    grid-column: span 1;
+    padding: 5px;
+    box-sizing: border-box;
+}
+
+.window-navbar .nav .nav-list > a.marked::after {
+    border-left: solid 1px var(--border-color);
+}
+
+.window-navbar .nav .nav-list > a::after {
+    content: "";
+    display: block;
+    grid-column: span 1;
+    padding: 5px;
+    box-sizing: border-box;
+}
+
+.window-navbar.actived .nav:hover .nav-list { display: grid; }
+.window-navbar.actived .nav .nav-list a:hover > .nav-handle { display: grid; }
+
+
+
+/* Blog */ 
+/********/
+
+.window-container .window-content .post {
+    display: grid;
+    margin: 10px;
+    width: 100%;
+    grid-template-columns: 1fr 100px;
+}
+
+.window-container .window-content .post-header {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    border-bottom: solid 1px var(--border-color);
+    padding: 2px;
+    font-size: 1.5em;
+    grid-column: span 1;
+}
+
+.window-container .window-content .post-date {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    border-bottom: solid 1px var(--border-color);
+    padding: 2px;
+    font-size: 1.0em;
+    grid-column: span 1;
+    color: rgb(80,80,80);
+}
+
+
+.window-container .window-content .post-message {
+    display: block;
+    width: 100%;
+    padding: 2px;
+    grid-column: span 2;
+}

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="UTF-8">
+    <title>Flighters Web Interface</title>
+    
+    <script type="text/javascript">
+        if (document.location.hash == "" || document.location.hash == "#") document.location.hash = "#blog";
+    </script>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="public/styles/orphan.css">
+
+    <!-- 
+    <script src="https://unpkg.com/bro-fs"></script>
+    <script src="https://unpkg.com/wired-elements@latest/dist/wired-elements.bundled.min.js"></script>
+    -->
+
+    <!-- DOM handling -->
+    <script src="public/scripts/dom.js"></script>
+
+    <!-- Oshirenie OS -->
+    <script src="public/scripts/main.js" async></script>
+
+</head>
+<body>
+
+    <div class="background" id="background">
+        <canvas id="canvas" width="3840" height="2160" style="width:100%;background-color:#2c343f;"></canvas>
+        <script src="public/scripts/animation.js"></script>
+    </div>
+    <div class="grinder">
+        <div class="header"></div>
+        <div class="left"></div>
+        <div class="focus"><div class="window-container">
+            <div class="window-bgcnt"><div class="window-background"></div></div>
+            <div class="window-title"> Flighters Window </div>
+
+            <div class="window-navbar"></div>
+            <div class="window-navbar">
+                <div class="nav">
+                    <div class="nav-button">Posting</div>
+                    <div class="nav-list">
+                        <a href="#new-post"><span>New Post</span></a>
+                        <a href="#login"><span>Login</span></a>
+                    </div>
+                </div>
+                <div class="nav">
+                    <div class="nav-button">About</div>
+                    <div class="nav-list">
+                        <a href="#blog"><span>Pressing</span></a>
+                        <a href="#helixd"><span>HelixD</span></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="window-sidebar">
+                <a class="button" href="#blog">Pressing</a>
+                <a class="button" href="#helixd">About Us</a>
+            </div>
+
+            <div class="window-content">
+                <%- include modules/about.ejs %>
+                <%- include modules/blog.ejs %>
+                <%- include modules/login.ejs %>
+                <%- include modules/post.ejs %>
+            </div>
+
+            <div class="window-status">
+                <div class="status-content"></div>
+                <div class="resize-handle"></div>
+            </div>
+
+        </div></div>
+        <div class="right"></div>
+        <div class="footer"></div>
+
+        <script>
+        (async ()=>{
+            let handles = document.querySelectorAll(".window-navbar");
+            new NavBar(handles[handles.length-1]);
+        })();
+        </script>
+
+        <script>(async ()=>{
+            let handles = document.querySelectorAll(".window-container");
+            new Draggable(handles[handles.length-1]);
+            new Resizable(handles[handles.length-1]);
+        })();</script>
+    </div>
+    
+
+
+</body>
+</html>
